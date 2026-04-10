@@ -120,11 +120,32 @@ class Stitcher:
         
             pts_l = np.array(pts_l)
             pts_r = np.array(pts_r)
-            # Your code here
-            # Use the method solve_homography(source_points,
-            # destination_points) from the class Homography in your implementation
-            # of the RANSAC algorithm
+            #AMI:compute homography
+            H = Homography().solve_homography(pts_l, pts_r)
 
+            if H is None:
+                continue
+
+            # Ami: compute inliers
+            inliers = []
+
+            for i, j in matches:
+                p1 = np.array([*keypoints_l[i].pt, 1])
+                p2 = np.array([*keypoints_r[j].pt, 1])
+
+                proj = H @ p1
+                proj /= proj[2]
+
+                error = np.linalg.norm(proj[:2] - p2[:2])
+
+                if error < 5:
+                    inliers.append((i, j))
+
+            if len(inliers) > len(max_inliers):
+                max_inliers = inliers
+                best_H = H
+        return best_H
+           
         
 
     def warping(self,img_left, img_right, homography):  # Add input arguments as you deem fit
@@ -162,12 +183,20 @@ class Blender:
 
 class Homography:
     def solve_homography(self, S, D):
-        '''
-        Find the homography matrix between a set of S points and a set of
-        D points
-        '''
 
-        # Your code here. You might want to use the DLT algorithm developed in cw1.
+        A = []
+
+        for i in range(len(S)):
+            x, y = S[i]
+            xp, yp = D[i]
+
+            A.append([-x, -y, -1, 0, 0, 0, x*xp, y*xp, xp])
+            A.append([0, 0, 0, -x, -y, -1, x*yp, y*yp, yp])
+
+        A = np.array(A)
+
+        U, S, Vt = np.linalg.svd(A)
+        H = Vt[-1].reshape(3, 3)
 
         return H
 
