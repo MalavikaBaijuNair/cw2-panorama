@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-
+import random
 
 class Stitcher:
     def __init__(self):
@@ -27,7 +27,7 @@ class Stitcher:
         self.draw_matches(img_left, img_right, matches, keypoints_l, keypoints_r)
 
         # Step 4 - fit the homography model with the RANSAC algorithm
-        homography = self.find_homography(matches)
+        homography = self.find_homography(matches, keypoints_l, keypoints_r)
 
         # Step 5 - Warp images to create the panoramic image
         result = self.warping(img_left, img_right, homography)  # Add input arguments as you deem fit
@@ -94,17 +94,38 @@ class Stitcher:
         cv2.imshow('correspondences', img_with_correspondences)
         cv2.waitKey(0)
 
-    def find_homography(self, matches):
+    def find_homography(self, matches, keypoints_l, keypoints_r):
         '''
         Fit the best homography model with the RANSAC algorithm.
         '''
+        # Malavika: RANSAC initialisation
+        max_inliers = []
+        best_H = None
+    
+        for _ in range(500):   # iterations (500 is enough for now)
+    
+            if len(matches) < 4:
+                break
+        
+            # Malavika: random sampling
+            sample = np.random.choice(len(matches), 4, replace=False)
+        
+            pts_l = []
+            pts_r = []
+        
+            for idx in sample:
+                i, j = matches[idx]
+                pts_l.append(keypoints_l[i].pt)
+                pts_r.append(keypoints_r[j].pt)
+        
+            pts_l = np.array(pts_l)
+            pts_r = np.array(pts_r)
+            # Your code here
+            # Use the method solve_homography(source_points,
+            # destination_points) from the class Homography in your implementation
+            # of the RANSAC algorithm
 
-        # Your code here
-        # Use the method solve_homography(source_points,
-        # destination_points) from the class Homography in your implementation
-        # of the RANSAC algorithm
-
-        return homography
+        
 
     def warping(self,img_left, img_right, homography):  # Add input arguments as you deem fit
         '''
