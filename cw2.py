@@ -30,8 +30,11 @@ class Stitcher:
         homography = self.find_homography(matches, keypoints_l, keypoints_r)
 
         # Step 5 - Warp images to create the panoramic image
-        result = self.warping(img_left, img_right, homography)  # Add input arguments as you deem fit
+        if homography is None:
+            print("Homography failed")
+            return img_left
 
+        result = self.warping(img_left, img_right, homography)
         return result
 
     def compute_descriptors(self, img):
@@ -134,6 +137,8 @@ class Stitcher:
                 p2 = np.array([*keypoints_r[j].pt, 1])
 
                 proj = H @ p1
+                if proj[2] == 0:
+                    continue
                 proj /= proj[2]
 
                 error = np.linalg.norm(proj[:2] - p2[:2])
@@ -145,19 +150,38 @@ class Stitcher:
                 max_inliers = inliers
                 best_H = H
         return best_H
-           
-        
+   #Ami :implementing warping        
+    def warping(self, img_left, img_right, homography):
 
-    def warping(self,img_left, img_right, homography):  # Add input arguments as you deem fit
-        '''
-           Warp images to create panoramic image
-        '''
+        h, w = img_left.shape[:2]
 
-        # Your code here. You will have to warp one image into another via the
-        # homography. Remember that the homography is an entity expressed in
-        # homogeneous coordinates.
+        # bigger canvas
+        result = np.zeros((h, w*2, 3), dtype=np.uint8)
+
+        # place left image first
+        result[0:h, 0:w] = img_left
+
+        # invert homography (important!)
+        H_inv = np.linalg.inv(homography)
+
+    
+        for y in range(h):
+            for x in range(w*2):
+
+                p = np.array([x, y, 1])
+                p_t = H_inv @ p
+                p_t /= p_t[2]
+
+                x_src, y_src = int(p_t[0]), int(p_t[1])
+
+                if 0 <= x_src < img_right.shape[1] and 0 <= y_src < img_right.shape[0]:
+                if result[y, x].sum() == 0:
+                    result[y, x] = img_right[y_src, x_src]
 
         return result
+    
+
+        
 
     def remove_black_border(self, img):
         '''
