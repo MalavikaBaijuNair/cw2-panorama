@@ -44,17 +44,27 @@ class Stitcher:
 
 
     def matching(self, keypoints_l, keypoints_r, descriptors_l, descriptors_r):
-    '''
-    Find the matching correspondences between the two images
-    '''
+        '''
+        Find the matching correspondences between the two images
+        '''
 
     good_matches = []
 
     # Ami: safety check before matching implementation
     if len(descriptors_l) == 0 or len(descriptors_r) == 0:
         return good_matches
-
-    # Your code here. You should also implement a step to select good matches.
+        
+    # Malavika: computing distances between descriptors
+    for i in range(len(descriptors_l)):
+        distances = []
+    
+        # compare descriptor i with all descriptors in right image
+        for j in range(len(descriptors_r)):
+            dist = np.linalg.norm(descriptors_l[i] - descriptors_r[j])
+            distances.append((dist, j))
+    
+        # sort matches based on smallest distance (best match first)
+        distances.sort(key=lambda x: x[0])
 
     return good_matches
 
