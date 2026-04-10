@@ -43,14 +43,20 @@ class Stitcher:
         return keypoints, descriptors
 
 
-    def matching(self, keypoints_l, keypoints_r, descriptors_l, descriptors_r):        # Add input arguments as you deem fit
-        '''
-            Find the matching correspondences between the two images
-        '''
+    def matching(self, keypoints_l, keypoints_r, descriptors_l, descriptors_r):
+    '''
+    Find the matching correspondences between the two images
+    '''
 
-        # Your code here. You should also implement a step to select good matches.
+    good_matches = []
 
+    # Ami: safety check before matching implementation
+    if len(descriptors_l) == 0 or len(descriptors_r) == 0:
         return good_matches
+
+    # Your code here. You should also implement a step to select good matches.
+
+    return good_matches
 
     def draw_matches(self, img_left, img_right, matches):
         '''
@@ -101,7 +107,7 @@ class Blender:
 
         return linear_blending_img
 
-    def customised_blending(self, ):
+    def customised_blending(self):
         '''
         Customised blending of your choice
         '''
