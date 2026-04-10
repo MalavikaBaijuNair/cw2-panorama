@@ -43,30 +43,38 @@ class Stitcher:
         return keypoints, descriptors
 
 
-    def matching(self, keypoints_l, keypoints_r, descriptors_l, descriptors_r):
-        '''
-        Find the matching correspondences between the two images
-        '''
+     def matching(self, keypoints_l, keypoints_r, descriptors_l, descriptors_r):
+         '''
+         Find the matching correspondences between the two images
+         '''
 
-    good_matches = []
+         good_matches = []
 
-    # Ami: safety check before matching implementation
-    if len(descriptors_l) == 0 or len(descriptors_r) == 0:
-        return good_matches
-        
-    # Malavika: computing distances between descriptors
-    for i in range(len(descriptors_l)):
-        distances = []
-    
-        # compare descriptor i with all descriptors in right image
-        for j in range(len(descriptors_r)):
-            dist = np.linalg.norm(descriptors_l[i] - descriptors_r[j])
-            distances.append((dist, j))
-    
-        # sort matches based on smallest distance (best match first)
-        distances.sort(key=lambda x: x[0])
+         # Ami: safety check before matching implementation
+         if len(descriptors_l) == 0 or len(descriptors_r) == 0:
+             return good_matches
 
-    return good_matches
+         # Malavika: computing distances between descriptors
+         for i in range(len(descriptors_l)):
+             distances = []
+
+             # compare descriptor i with all descriptors in right image
+             for j in range(len(descriptors_r)):
+                 dist = np.linalg.norm(descriptors_l[i] - descriptors_r[j])
+                 distances.append((dist, j))
+
+             if len(distances) == 0:
+                 continue
+
+             # sort matches based on smallest distance (best match first)
+             distances.sort(key=lambda x: x[0])
+
+             best_dist, best_j = distances[0] #adding matching 
+
+             if best_dist < 300:
+                 good_matches.append((i, best_j))
+
+             return good_matches  
 
     def draw_matches(self, img_left, img_right, matches):
         '''
