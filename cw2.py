@@ -24,7 +24,7 @@ class Stitcher:
         print("Number of matching correspondences selected:", len(matches))
 
         # Step 3 - Draw the matches connected by lines
-        self.draw_matches(img_left, img_right, matches)
+        self.draw_matches(img_left, img_right, matches, keypoints_l, keypoints_r)
 
         # Step 4 - fit the homography model with the RANSAC algorithm
         homography = self.find_homography(matches)
@@ -43,47 +43,54 @@ class Stitcher:
         return keypoints, descriptors
 
 
-     def matching(self, keypoints_l, keypoints_r, descriptors_l, descriptors_r):
-         '''
-         Find the matching correspondences between the two images
-         '''
-
-         good_matches = []
-
-         # Ami: safety check before matching implementation
-         if len(descriptors_l) == 0 or len(descriptors_r) == 0:
-             return good_matches
-
-         # Malavika: computing distances between descriptors
-         for i in range(len(descriptors_l)):
-             distances = []
-
-             # compare descriptor i with all descriptors in right image
-             for j in range(len(descriptors_r)):
-                 dist = np.linalg.norm(descriptors_l[i] - descriptors_r[j])
-                 distances.append((dist, j))
-
-             if len(distances) == 0:
-                 continue
-
-             # sort matches based on smallest distance (best match first)
-             distances.sort(key=lambda x: x[0])
-
-             best_dist, best_j = distances[0] #adding matching 
-
-             if best_dist < 300:
-                 good_matches.append((i, best_j))
-
-             return good_matches  
-
-    def draw_matches(self, img_left, img_right, matches):
+    def matching(self, keypoints_l, keypoints_r, descriptors_l, descriptors_r):
         '''
-            Connect correspondences between images with lines and draw these
-            lines
+        Find the matching correspondences between the two images
         '''
 
-        # Your code here
+        good_matches = []
 
+        # Ami: safety check before matching implementation
+        if len(descriptors_l) == 0 or len(descriptors_r) == 0:
+            return good_matches
+    
+        # Malavika: computing distances between descriptors
+        for i in range(len(descriptors_l)):
+            distances = []
+    
+            for j in range(len(descriptors_r)):
+                dist = np.linalg.norm(descriptors_l[i] - descriptors_r[j])
+                distances.append((dist, j))
+    
+            if len(distances) == 0:
+                continue
+    
+            distances.sort(key=lambda x: x[0])
+    
+            best_dist, best_j = distances[0]
+    
+            if best_dist < 300:
+                good_matches.append((i, best_j))
+    
+        return good_matches 
+
+    def draw_matches(self, img_left, img_right, matches, keypoints_l, keypoints_r):
+        '''
+        Connect correspondences between images with lines and draw these lines
+        '''
+
+        # Malavika: drawing lines between matched keypoints
+        img = np.hstack((img_left, img_right))
+    
+        for (i, j) in matches:
+            pt1 = tuple(map(int, keypoints_l[i].pt))
+            pt2 = tuple(map(int, keypoints_r[j].pt))
+            pt2 = (int(pt2[0] + img_left.shape[1]), int(pt2[1]))
+    
+            cv2.line(img, pt1, pt2, (0, 255, 0), 1)
+    
+        img_with_correspondences = img
+    
         cv2.imshow('correspondences', img_with_correspondences)
         cv2.waitKey(0)
 
