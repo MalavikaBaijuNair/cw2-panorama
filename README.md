@@ -44,9 +44,11 @@ Both members were actively involved in improving, verifying, and refining each s
 The algorithm was tested on:
 - Provided coursework images (successful stitching)
 - Self-captured images (variable performance depending on scene structure)
+  
 Note:
 After running the code, the correspondence image appears first.
 Press any key to display the final stitched result.
+
 ---
 ## Running with Different Images
 
