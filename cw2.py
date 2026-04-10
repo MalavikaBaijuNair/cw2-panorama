@@ -35,13 +35,13 @@ class Stitcher:
         return result
 
     def compute_descriptors(self, img):
-        '''
-        The feature detector and descriptor
-        '''
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # Your code here
+        sift = cv2.SIFT_create()
+        keypoints, descriptors = sift.detectAndCompute(gray, None)
 
         return keypoints, descriptors
+
 
     def matching(self, keypoints_l, keypoints_r, descriptors_l, descriptors_r):        # Add input arguments as you deem fit
         '''
