@@ -46,6 +46,21 @@ The algorithm was tested on:
 - Self-captured images (variable performance depending on scene structure)
 
 ---
+## Running with Different Images
+
+The repository includes both the provided images (`.jpg`) and self-captured images (`.jpeg`).
+
+To run the code with different images, update the file names in the main section of `cw2.py`:
+
+- For provided images:
+   
+  img_left = cv2.imread("s1.jpg")
+  img_right = cv2.imread("s2.jpg")
+
+- For self-captured images:
+
+img_left = cv2.imread("s1.jpeg")
+img_right = cv2.imread("s2.jpeg")
 
 ## Observations
 The method performs well on structured scenes with strong geometric features. Performance degrades in cases with:
